@@ -10,7 +10,7 @@ env:
   REGISTRY: ghcr.io
   DOCKERHUB_REGISTRY: docker.io
   IMAGE_NAME: ${{ github.repository }}
-  MEM0_VERSION: v0.1.10
+  MEM0_VERSION: v0.1.11
 
 jobs:
   build-and-publish:
