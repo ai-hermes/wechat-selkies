@@ -13,6 +13,7 @@ LABEL org.opencontainers.image.licenses="GPL-3.0-only"
 # Build arguments for multi-arch support
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
+ARG TARGETARCH
 RUN echo "🏗️ Building WeChat-Selkies on $BUILDPLATFORM, targeting $TARGETPLATFORM"
 
 # set environment variables
@@ -58,6 +59,18 @@ RUN git clone https://github.com/ai-hermes/wechat-decrypt.git /opt/wechat-decryp
     python3 -m venv venv && \
     . venv/bin/activate && \
     pip install --no-cache-dir -r requirements.txt
+
+# Install prebuilt wechat-mem0-core binary into container.
+COPY chatlog/dist/wechat-mem0-core/wechat-mem0-core_linux_amd64 /tmp/wechat-mem0-core_linux_amd64
+COPY chatlog/dist/wechat-mem0-core/wechat-mem0-core_linux_arm64 /tmp/wechat-mem0-core_linux_arm64
+RUN mkdir -p /app/rethink-ai && \
+    case "$TARGETARCH" in \
+      "amd64") cp /tmp/wechat-mem0-core_linux_amd64 /app/rethink-ai/wechat-mem0-core ;; \
+      "arm64") cp /tmp/wechat-mem0-core_linux_arm64 /app/rethink-ai/wechat-mem0-core ;; \
+      *) echo "❌ Unsupported architecture for wechat-mem0-core: $TARGETARCH" >&2; exit 1 ;; \
+    esac && \
+    chmod +x /app/rethink-ai/wechat-mem0-core && \
+    rm -f /tmp/wechat-mem0-core_linux_amd64 /tmp/wechat-mem0-core_linux_arm64
 
 # Clean up
 RUN apt-get purge -y --autoremove
