@@ -42,12 +42,12 @@ jobs:
         sudo apt-get install -y --no-install-recommends build-essential libsqlite3-dev
 
     - name: Build wechat-mem0-core
-      working-directory: chatlog
       env:
         GOOS: linux
         GOARCH: ${{ matrix.goarch }}
         CGO_ENABLED: "1"
       run: |
+        cd chatlog
         mkdir -p dist/wechat-mem0-core
         go build -trimpath -o dist/wechat-mem0-core/wechat-mem0-core_linux_${{ matrix.arch }} ./cmd/wechat-mem0-core
         ls -lah dist/wechat-mem0-core
